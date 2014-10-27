@@ -15,31 +15,38 @@ function KaChing (cacheDir) {
   return kaChing;
 
   function kaChing(id, provider) {
-    providers[id] = provider || providers[id];
-    provider = providers[id];
+    provider = providerFor(id, provider);
+
     if(typeof provider !== 'function') {
       return empty();
     }
     if(cached[id]) {
       return cached[id].createReadable();
     }
+    return makeCachedStream(id, provider);
+  }
 
-    var cachePath = path.join(cacheDir, id);
-    var cachedStream = provider().pipe(writeRead(cachePath, { delayOpen: true }));
+  function makeCachedStream (id, provider) {
+    var cachedStream = writeRead(cachePathFor(id), { delayOpen: true });
     cached[id] = cachedStream;
     whenDirectoryReady(function (err) {
       cachedStream.open();
     });
+    provider().pipe(cachedStream);
     return cachedStream;
   }
 
   function remove (id, callback) {
-    var cachePath = path.join(cacheDir, id);
-    fs.unlink(cachePath, callback);
+    fs.unlink(cachePathFor(id), callback);
     delete cached[id];
   }
 
-
+  function cachePathFor (id) {
+    return path.join(cacheDir, id);
+  }
+  function providerFor (id, provider) {
+    return providers[id] = provider || providers[id];
+  }
   function whenDirectoryReady (callback) {
     mkdirp(cacheDir, callback);
   }
