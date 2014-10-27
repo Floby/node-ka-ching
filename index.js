@@ -9,10 +9,14 @@ module.exports = KaChing;
 
 function KaChing (cacheDir) {
   var cached = {};
+  var providers = {};
   kaChing.clear = clear;
+  kaChing.remove = remove;
   return kaChing;
 
   function kaChing(id, provider) {
+    providers[id] = provider || providers[id];
+    provider = providers[id];
     if(typeof provider !== 'function') {
       return empty();
     }
@@ -27,6 +31,12 @@ function KaChing (cacheDir) {
       cachedStream.open();
     });
     return cachedStream;
+  }
+
+  function remove (id, callback) {
+    var cachePath = path.join(cacheDir, id);
+    fs.unlink(cachePath, callback);
+    delete cached[id];
   }
 
 
