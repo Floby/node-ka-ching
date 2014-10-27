@@ -1,1 +1,5 @@
-module.exports = function () {}
+module.exports = KaChing;
+
+function KaChing () {
+  return function () {};
+}
