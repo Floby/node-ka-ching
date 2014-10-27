@@ -2,14 +2,21 @@ var stream = require('stream');
 var sink = require('stream-sink');
 var sinon = require('sinon');
 var expect = require('chai').expect;
+var path = require('path');
 var assert = require('chai').assert;
 var KaChing = require('..');
+
+var cacheDir = path.join(__dirname, '/cache-test');
 
 describe('A KaChing instance', function () {
   var kaChing;
   beforeEach(function () {
-    kaChing = KaChing();
+    kaChing = KaChing(cacheDir);
   });
+
+  //afterEach(function (done) {
+    //kaChing.clear(done);
+  //})
 
   it('is a function', function () {
     expect(kaChing).to.be.a('function');
@@ -31,7 +38,7 @@ describe('A KaChing instance', function () {
   });
 
   describe('when called with a provider', function () {
-    it('calls the provider', function (done) {
+    it('calls the provider and returns a stream with its contents', function (done) {
       var provider = sinon.spy(function () {
         return streamWithContent('Hello World');
       });
@@ -41,7 +48,23 @@ describe('A KaChing instance', function () {
         expect(contents).to.equal('Hello World');
         done();
       });
-    })
+    });
+
+    describe('a second time', function () {
+      it('does not call the provider again', function (done) {
+        var provider = sinon.spy(function () {
+          return streamWithContent('Hello World');
+        });
+
+        kaChing('chose', provider).pipe(sink()).on('data', function() {
+          kaChing('chose', provider).pipe(sink()).on('data', function(contents) {
+            assert.equal(provider.callCount, 1, 'provider should have been called once');
+            expect(contents).to.equal('Hello World');
+            done();
+          });
+        });
+      })
+    });
   });
 
 });
