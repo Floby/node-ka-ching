@@ -1,0 +1,44 @@
+{
+  "name": "ka-ching",
+  "version": "0.0.3",
+  "description": "A caching module for streams",
+  "main": "index.js",
+  "directories": {
+    "test": "test"
+  },
+  "scripts": {
+    "test": "istanbul cover --print detail _mocha -- -R list test",
+    "coveralls": "cat coverage/lcov.info | coveralls"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/Floby/node-ka-ching.git"
+  },
+  "keywords": [
+    "stream",
+    "streams",
+    "cache",
+    "tags",
+    "tag",
+    "caching",
+    "level",
+    "leveldb",
+    "shania",
+    "twain"
+  ],
+  "author": "Florent Jaby <florent.jaby@gmail.com>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/Floby/node-ka-ching/issues"
+  },
+  "homepage": "https://github.com/Floby/node-ka-ching",
+  "devDependencies": {
+    "chai": "^1.9.2",
+    "coveralls": "^2.11.2",
+    "istanbul": "^0.3.2",
+    "mocha": "^2.0.1",
+    "stream-sink": "^1.2.0",
+    "trycatch": "^1.5.11"
+  },
+  "dependencies": {}
+}
