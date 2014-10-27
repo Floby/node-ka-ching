@@ -6,6 +6,14 @@ function KaChing () {
   return kaChing;
 
   function kaChing() {
-    return stream.Readable();
+    return empty();
   }
+}
+
+
+
+function empty () {
+  var empty = stream.PassThrough()
+  empty.end();
+  return empty;
 }
