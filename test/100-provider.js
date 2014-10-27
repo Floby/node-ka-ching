@@ -6,7 +6,7 @@ var path = require('path');
 var assert = require('chai').assert;
 var KaChing = require('..');
 
-var cacheDir = path.join(__dirname, '/cache-test');
+var cacheDir = path.join(__dirname, 'cache-test');
 
 describe('A KaChing instance', function () {
   var kaChing;
@@ -14,9 +14,12 @@ describe('A KaChing instance', function () {
     kaChing = KaChing(cacheDir);
   });
 
-  //afterEach(function (done) {
-    //kaChing.clear(done);
-  //})
+  afterEach(function (done) {
+    kaChing.clear(function (err) {
+      if(/ENOENT/.test(err)) return done();
+      done(err);
+    })
+  })
 
   it('is a function', function () {
     expect(kaChing).to.be.a('function');
@@ -43,7 +46,7 @@ describe('A KaChing instance', function () {
         return streamWithContent('Hello World');
       });
 
-      kaChing('chose', provider).pipe(sink()).on('data', function(contents) {
+      kaChing('bidule', provider).pipe(sink()).on('data', function(contents) {
         assert.equal(provider.callCount, 1, 'provider should have been called once');
         expect(contents).to.equal('Hello World');
         done();
