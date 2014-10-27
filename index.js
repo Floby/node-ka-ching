@@ -19,16 +19,18 @@ function KaChing (cacheDir) {
     if(cached[id]) {
       return cached[id].createReadable();
     }
+
     var cachePath = path.join(cacheDir, id);
-    withDirectory(function (err) {
-      console.log('got directory');
-      cached[id].open();
+    var cachedStream = provider().pipe(writeRead(cachePath, { delayOpen: true }));
+    cached[id] = cachedStream;
+    whenDirectoryReady(function (err) {
+      cachedStream.open();
     });
-    return cached[id] = provider().pipe(writeRead(cachePath, { delayOpen: true }))
+    return cachedStream;
   }
 
 
-  function withDirectory (callback) {
+  function whenDirectoryReady (callback) {
     mkdirp(cacheDir, callback);
   }
   function clear (callback) {
