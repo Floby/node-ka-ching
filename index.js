@@ -5,8 +5,11 @@ module.exports = KaChing;
 function KaChing () {
   return kaChing;
 
-  function kaChing() {
-    return empty();
+  function kaChing(id, provider) {
+    if(typeof provider !== 'function') {
+      return empty()
+    }
+    return provider();
   }
 }
 
