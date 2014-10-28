@@ -32,7 +32,6 @@ kaChing('my-cached-resource-id', function () {
 
 ##### delete a cached resource
 
-The first subsequent request for this ID will call the provider
 
 ```javascript
 kaChing.remove('my-cached-resource-id', function (err) {
@@ -43,12 +42,27 @@ kaChing.remove('my-cached-resource-id', function (err) {
 var uncached = kaChing('my-cached-resource-id');
 ```
 
+The first subsequent request for this ID will call the provider
+
+
 Test
 ----
 
 	npm test
     
 Tests are written with mocha and coverage is made by istanbul.
+
+
+Gotchas
+-------
+
+* Only works with `text/buffer` streams. If you'd like to cache `objectMode` streams,
+you should handle serialisation/deserialisation yourself
+* No intelligence whatsoever as to when to invalidate cached data
+* Does not play well with concurrent access to the file system
+* Cannot recover from file system after restart
+
+These are not necessarily intended and may be handled in the future
 
 Contributing
 ------------
