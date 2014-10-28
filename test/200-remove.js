@@ -52,6 +52,19 @@ describe('A KaChing instance', function () {
           });
         });
       });
+
+      it('relays the event on the stream itself', function (done) {
+        var provider = streamWithContent.bind(null, 'Hey Hoy');
+        var onRemove = sinon.spy();
+        kaChing('to-remove-single', provider).on('remove', onRemove).pipe(sink()).on('data', function() {
+          kaChing.remove('to-remove-single', function (err) {
+            if(err) return done(err);
+            assert(onRemove.calledOnce, 'onRemove should have been called');
+            assert(onRemove.calledWith(), 'onRemove should have been called with the resource id');
+            done();
+          });
+        });
+      })
     });
   })
 });
