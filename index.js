@@ -20,10 +20,18 @@ function KaChing (cacheDir) {
     if(typeof provider !== 'function') {
       throw new Error('No provider found for resource ' + id);
     }
-    if(cached[id]) {
-      return cached[id].createReadable();
-    }
-    return makeCachedStream(id, provider);
+
+    var output = stream.PassThrough();
+    isCacheAvailable(id, function (available) {
+      (available ? getCachedStream(id) : makeCachedStream(id, provider))
+        .pipe(output)
+    });
+
+    return output;
+  }
+
+  function getCachedStream (id) {
+    return cached[id].createReadable();
   }
 
   function makeCachedStream (id, provider) {
@@ -34,6 +42,10 @@ function KaChing (cacheDir) {
     });
     provider().pipe(cachedStream);
     return cachedStream;
+  }
+
+  function isCacheAvailable (id, callback) {
+    callback(Boolean(cached[id]));
   }
 
   function remove (id, callback) {
