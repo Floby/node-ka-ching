@@ -45,7 +45,7 @@ function KaChing (cacheDir) {
   }
 
   function isCacheAvailable (id, callback) {
-    callback(Boolean(cached[id]));
+    process.nextTick(callback.bind(null, Boolean(cached[id])));
   }
 
   function remove (id, callback) {
