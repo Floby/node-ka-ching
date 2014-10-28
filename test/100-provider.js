@@ -26,17 +26,15 @@ describe('A KaChing instance', function () {
   });
 
   it('returns a readable stream', function () {
-    var readable = kaChing('bidule');
+    var readable = kaChing('bidule', streamWithContent.bind(null, 'Hello World'));
     expect(readable).to.be.an.instanceof(stream.Readable);
   });
 
   describe('when called with no provider', function () {
-    it('returns an empty readable stream', function (done) {
-      var readable = kaChing('bidule');
-      readable.pipe(sink()).on('data', function(contents) {
-        expect(contents).to.equal('');
-        done();
-      });
+    it('throws an error', function () {
+      expect(function () {
+        var readable = kaChing('bidule');
+      }).to.throw(/no provider/i)
     })
   });
 

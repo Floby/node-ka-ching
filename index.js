@@ -18,7 +18,7 @@ function KaChing (cacheDir) {
     provider = providerFor(id, provider);
 
     if(typeof provider !== 'function') {
-      return empty();
+      throw new Error('No provider found for resource ' + id);
     }
     if(cached[id]) {
       return cached[id].createReadable();
@@ -53,10 +53,4 @@ function KaChing (cacheDir) {
   function clear (callback) {
     rmR(cacheDir).node(callback);
   }
-}
-
-function empty () {
-  var empty = stream.PassThrough()
-  empty.end();
-  return empty;
 }
