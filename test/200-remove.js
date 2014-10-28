@@ -38,6 +38,20 @@ describe('A KaChing instance', function () {
           })
         });
       });
+
+      it('emits a "remove" event', function (done) {
+        var provider = streamWithContent.bind(null, 'Hey Hoy');
+        var onRemove = sinon.spy();
+        kaChing.on('remove', onRemove);
+        kaChing('to-remove', provider).pipe(sink()).on('data', function() {
+          kaChing.remove('to-remove', function (err) {
+            if(err) return done(err);
+            assert(onRemove.calledOnce, 'onRemove should have been called');
+            assert(onRemove.calledWith('to-remove'), 'onRemove should have been called with the resource id');
+            done();
+          });
+        });
+      });
     });
   })
 });

@@ -1,8 +1,10 @@
 var fs = require('fs');
 var rmR = require('rm-r');
 var mkdirp = require('mkdirp');
+var mixin = require('merge-descriptors');
 var path = require('path');
 var stream = require('stream');
+var EventEmitter = require('events').EventEmitter;
 var writeRead = require('stream-write-read');
 
 module.exports = KaChing;
@@ -12,6 +14,8 @@ function KaChing (cacheDir) {
   var providers = {};
   kaChing.clear = clear;
   kaChing.remove = remove;
+  mixin(kaChing, EventEmitter.prototype);
+
   return kaChing;
 
   function kaChing(id, provider) {
@@ -51,6 +55,7 @@ function KaChing (cacheDir) {
   function remove (id, callback) {
     fs.unlink(cachePathFor(id), callback);
     delete cached[id];
+    kaChing.emit('remove', id);
   }
 
   function cachePathFor (id) {
