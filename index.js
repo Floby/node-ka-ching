@@ -47,8 +47,7 @@ function KaChing (cacheDir) {
     whenDirectoryReady(function (err) {
       cachedStream.open();
     });
-    provider().pipe(cachedStream);
-    return cachedStream;
+    return provider().pipe(cachedStream);
   }
 
   function isCacheAvailable (id, callback) {
