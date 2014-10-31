@@ -98,7 +98,7 @@ function lruOptions (options) {
   if (options.memoryCache === true) {
     max = 5 * 1024 * 1024 // 5 mo
   }
-  else  {
+  else {
     max = options.memoryCache;
   }
   return {
