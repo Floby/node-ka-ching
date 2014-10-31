@@ -59,8 +59,7 @@ function KaChing (cacheDir, options) {
       cachedStream.open();
     });
     cached[id] = cachedStream;
-    var depender = dependerFor();
-    depender.once('invalid', remove.bind(null, id));
+    var depender = dependerFor(id);
     fillMemoryCache(cachedStream, id);
     return provider.call(depender).pipe(cachedStream);
   }
@@ -86,6 +85,7 @@ function KaChing (cacheDir, options) {
 
   function dependerFor (id) {
     var depender = Depender();
+    depender.once('invalid', remove.bind(null, id));
     if(options.maxAge) depender.expires.in(options.maxAge);
     return depender;
   }
