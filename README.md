@@ -44,6 +44,28 @@ var uncached = kaChing('my-cached-resource-id');
 
 The first subsequent request for this ID will call the provider
 
+##### in-memory caching
+
+You can provide a `memoryCache` option to the `KaChing` constructor.
+It will in turn also use an `lru-cache` for cached resources.
+
+```javascript
+var kaChing = require('ka-ching')('/path/to/cache/dir', {
+  memoryCache: true
+});
+var request = require('request');
+
+kaChing('my-cached-resource-id', function () {
+  return request('http://google.com/');
+}).pipe(destination);
+
+```
+
+My personal (and unpublished) benchmarks have shown that this is seldom useful
+as your OS is probably already doing it with the files that kaChing reads most
+often. They have however showed some improvement for the 98-99% percentiles
+in a HTTP server of roughly 30%.
+
 
 Test
 ----

@@ -75,6 +75,20 @@ describe('A KaChing instance', function () {
       });
     });
   })
+
+  describe('if the memoryCache option is a boolean', function () {
+    it('uses a default `max` value for its lru-cache', function () {
+      var LRU = sinon.spy(function (options) {
+        expect(options.max).to.equal(5 * 1024 * 1024);
+        return {};
+      })
+      var KaChing = proxyquire('..', {
+        'lru-cache': LRU
+      });
+      var kaChing = KaChing(cacheDir, {memoryCache: true});
+      assert(LRU.called, 'LRU should have been constructed');
+    });
+  });
 });
 
 

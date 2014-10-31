@@ -11,7 +11,6 @@ var LRU = require('lru-cache');
 var BlackHoleLRU = require('./lib/blackhole-lru');
 var sink = require('stream-sink');
 
-
 module.exports = KaChing;
 
 function KaChing (cacheDir, options) {
@@ -95,8 +94,7 @@ function KaChing (cacheDir, options) {
 }
 
 var defaultLruOptions = {
-  max: 1 * 1024 * 1024, // 1 Mo
-  maxAge: 2 * 60 * 1000, // 1 minute
+  max: 5 * 1024 * 1024, // 1 Mo
   length: function (n) { return n.length }
 }
 
