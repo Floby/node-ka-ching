@@ -89,6 +89,20 @@ describe('A KaChing instance', function () {
       assert(LRU.called, 'LRU should have been constructed');
     });
   });
+
+  describe('if the memoryCache option is a number', function () {
+    it('uses this value for its lru-cache', function () {
+      var LRU = sinon.spy(function (options) {
+        expect(options.max).to.equal(8);
+        return {};
+      })
+      var KaChing = proxyquire('..', {
+        'lru-cache': LRU
+      });
+      var kaChing = KaChing(cacheDir, {memoryCache: 8});
+      assert(LRU.called, 'LRU should have been constructed');
+    });
+  });
 });
 
 

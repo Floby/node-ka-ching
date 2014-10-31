@@ -17,7 +17,7 @@ function KaChing (cacheDir, options) {
   options = options || {};
   var cached = {};
   var providers = {};
-  var lru = options.memoryCache ? LRU(defaultLruOptions) : BlackHoleLRU()
+  var lru = options.memoryCache ? LRU(lruOptions(options)) : BlackHoleLRU()
   kaChing.clear = clear;
   kaChing.remove = remove;
   mixin(kaChing, EventEmitter.prototype);
@@ -93,8 +93,17 @@ function KaChing (cacheDir, options) {
   }
 }
 
-var defaultLruOptions = {
-  max: 5 * 1024 * 1024, // 1 Mo
-  length: function (n) { return n.length }
+function lruOptions (options) {
+  var max;
+  if (options.memoryCache === true) {
+    max = 5 * 1024 * 1024 // 5 mo
+  }
+  else  {
+    max = options.memoryCache;
+  }
+  return {
+    max: max,
+    length: function (n) { return n.length }
+  }
 }
 
