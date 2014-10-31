@@ -61,6 +61,9 @@ kaChing('my-cached-resource-id', function () {
 
 ```
 
+When `memoryCache` is a number instead of a boolean, then its value is used
+as the maximum size (in bytes) for the underlying `lru-cache`.
+
 My personal (and unpublished) benchmarks have shown that this is seldom useful
 as your OS is probably already doing it with the files that kaChing reads most
 often. They have however showed some improvement for the 98-99% percentiles
