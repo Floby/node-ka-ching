@@ -35,7 +35,7 @@ kaChing('my-cached-resource-id', function () {
 
 ```javascript
 kaChing.remove('my-cached-resource-id', function (err) {
-  // called when the filed is removed from disk
+  // called when the file is removed from disk
 })
 
 // this will call the provider again
