@@ -16,14 +16,16 @@ describe('A KaChing instance', function () {
     var lru;
 
     beforeEach(function () {
+      var lengthfn;
       cache = {};
       lru = {
         get: sinon.spy(function (k) { return cache[k] }),
-        set: sinon.spy(function (k, v) { cache[k] = v }),
+        set: sinon.spy(function (k, v) { lengthfn(v) ; cache[k] = v }),
         has: sinon.spy(function (k) { return cache.hasOwnProperty(k) }),
         del: sinon.spy(function (k) { delete cache[k] })
       };
-      var LRU = function () {
+      var LRU = function (options) {
+        lengthfn = options.length;
         return lru;
       };
       var KaChing = proxyquire('..', {

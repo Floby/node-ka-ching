@@ -1,14 +1,17 @@
+var proxyquire = require('proxyquire');
 var stream = require('stream');
 var sink = require('stream-sink');
 var sinon = require('sinon');
 var expect = require('chai').expect;
 var path = require('path');
 var assert = require('chai').assert;
-var KaChing = require('..');
 
 var cacheDir = path.join(__dirname, 'cache-test');
 
 describe('A KaChing instance', function () {
+  var KaChing = proxyquire('..', {
+    'lru-cache': {}
+  });
   var kaChing;
   beforeEach(function () {
     kaChing = KaChing(cacheDir);

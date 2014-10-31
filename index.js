@@ -13,14 +13,21 @@ var sink = require('stream-sink');
 
 module.exports = KaChing;
 
-function KaChing (cacheDir) {
+function KaChing (cacheDir, options) {
+  options = options || {};
   var cached = {};
   var providers = {};
-  var lru = LRU({
-    max: 1 * 1024 * 1024, // 1 Mo
-    maxAge: 2 * 60 * 1000, // 1 minute
-    length: function (n) { return n.length }
-  });
+  var lru;
+  if(options.memoryCache) {
+    lru = LRU({
+      max: 1 * 1024 * 1024, // 1 Mo
+      maxAge: 2 * 60 * 1000, // 1 minute
+      length: function (n) { return n.length }
+    });
+  }
+  else {
+    lru = BlackHoleLRU();
+  }
 
   kaChing.clear = clear;
   kaChing.remove = remove;
@@ -93,4 +100,12 @@ function KaChing (cacheDir) {
   function clear (callback) {
     rmR(cacheDir).node(callback);
   }
+}
+
+function BlackHoleLRU () {
+  if(!(this instanceof BlackHoleLRU)) return new BlackHoleLRU();
+
+  this.has = function () { return false };
+  this.set = function () {};
+  this.del = function () {};
 }
