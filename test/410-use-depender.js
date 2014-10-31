@@ -65,6 +65,41 @@ describe('A KaChing instance', function () {
 
 });
 
+describe('A KaChing instance', function () {
+  var depender;
+  var DependerMock;
+  var kaChing;
+  beforeEach(function () {
+    DependerMock = function () {
+      return depender;
+    };
+    var KaChing = proxyquire('..', {
+      './lib/depender': DependerMock
+    })
+    kaChing = KaChing(cacheDir, { maxAge: 60 * 1000 });
+  });
+
+  afterEach(function (done) {
+    depender = null;
+    kaChing.clear(function (err) {
+      if(/ENOENT/.test(err)) return done();
+      done(err);
+    })
+  })
+
+  describe('with the maxAge option', function () {
+    it('should setup the depender for any new resource', function (done) {
+      depender = new Depender();
+      sinon.stub(depender.expires, 'in').returns(null);
+      var provider = streamWithContent.bind(null, 'Hello world!');
+      kaChing('hello', provider).pipe(sink()).on('data', function(data) {
+        assert(depender.expires.in.calledWith(60*1000), 'expires.in should have been called');
+        done();
+      });
+    })
+  })
+});
+
 
 
 function streamWithContent (content) {
