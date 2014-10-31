@@ -45,12 +45,18 @@ describe('a Depender instance', function () {
     afterEach(function () {
       onDate.restore();
     })
-    it('uses a cache-depend Date instance', null, function () {
+    it('uses a cache-depend Date instance', function (done) {
       var depender = new Depender();
       var date = new Date();
       depender.expires(date);
       assert(onDate.calledWith(date), 'CacheDepend.date should have been called');
-      // TODO assert that the emitter is added to the dependencies
+      depender.on('invalid', function() {
+        done();
+      });
+
+      setTimeout(function() {
+        emitter.emit('change', {});
+      }, 5)
     });
   });
 });
