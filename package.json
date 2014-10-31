@@ -15,14 +15,14 @@
     "url": "git://github.com/Floby/node-ka-ching.git"
   },
   "keywords": [
+    "cache",
+    "caching",
     "stream",
     "streams",
-    "cache",
+    "streaming",
+    "lru-cache",
     "tags",
     "tag",
-    "caching",
-    "level",
-    "leveldb",
     "shania",
     "twain"
   ],
