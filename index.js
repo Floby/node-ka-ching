@@ -17,18 +17,7 @@ function KaChing (cacheDir, options) {
   options = options || {};
   var cached = {};
   var providers = {};
-  var lru;
-  if(options.memoryCache) {
-    lru = LRU({
-      max: 1 * 1024 * 1024, // 1 Mo
-      maxAge: 2 * 60 * 1000, // 1 minute
-      length: function (n) { return n.length }
-    });
-  }
-  else {
-    lru = BlackHoleLRU();
-  }
-
+  var lru = options.memoryCache ? LRU(defaultLruOptions) : BlackHoleLRU()
   kaChing.clear = clear;
   kaChing.remove = remove;
   mixin(kaChing, EventEmitter.prototype);
@@ -68,12 +57,14 @@ function KaChing (cacheDir, options) {
     whenDirectoryReady(function (err) {
       cachedStream.open();
     });
-    setImmediate(function () {
-      cachedStream.createReadable().pipe(sink()).on('data', function(data) {
-        lru.set(id, data);
-      });
-    });
+    fillMemoryCache(cachedStream, id);
     return provider().pipe(cachedStream);
+  }
+
+  function fillMemoryCache (cachedStream, id) {
+    cachedStream.createReadable().pipe(sink()).on('data', function(data) {
+      lru.set(id, data);
+    });
   }
 
   function isCacheAvailable (id, callback) {
@@ -100,6 +91,12 @@ function KaChing (cacheDir, options) {
   function clear (callback) {
     rmR(cacheDir).node(callback);
   }
+}
+
+var defaultLruOptions = {
+  max: 1 * 1024 * 1024, // 1 Mo
+  maxAge: 2 * 60 * 1000, // 1 minute
+  length: function (n) { return n.length }
 }
 
 function BlackHoleLRU () {
