@@ -53,7 +53,7 @@ describe('A KaChing instance', function () {
             assert.equal(data, 'Hello World', 'Data should be the same');
             assert(lru.has.calledWith('test'), 'lru.has should have been called');
             assert(lru.get.calledWith('test'), 'lru.get should have been called');
-            expect(cache.test).to.equal('Hello World');
+            expect(cache.test.toString()).to.equal('Hello World');
             done();
           });
         }, 5);

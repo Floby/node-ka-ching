@@ -65,7 +65,7 @@ function KaChing (cacheDir, options) {
 
   function fillMemoryCache (cachedStream, id) {
     cachedStream.createReadable().pipe(sink()).on('data', function(data) {
-      lru.set(id, data);
+      lru.set(id, new Buffer(data));
     });
   }
 
