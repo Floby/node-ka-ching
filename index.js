@@ -3,6 +3,7 @@ var rmR = require('rm-r');
 var mkdirp = require('mkdirp');
 var mixin = require('merge-descriptors');
 var path = require('path');
+var noop = require('node-noop');
 var stream = require('stream');
 var EventEmitter = require('events').EventEmitter;
 var emit = EventEmitter.prototype.emit;
@@ -56,6 +57,7 @@ function KaChing (cacheDir, options) {
     var cachedStream = writeRead(cachePathFor(id), { delayOpen: true });
     cached[id] = cachedStream;
     var depender = Depender();
+    depender.once('invalid', remove.bind(null, id));
     whenDirectoryReady(function (err) {
       cachedStream.open();
     });
@@ -74,6 +76,7 @@ function KaChing (cacheDir, options) {
   }
 
   function remove (id, callback) {
+    callback = callback || noop;
     fs.unlink(cachePathFor(id), callback);
     kaChing.emit('remove', id);
     kaChing.emit('remove:' + id);

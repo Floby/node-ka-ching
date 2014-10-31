@@ -7,6 +7,7 @@ var expect = require('chai').expect;
 var path = require('path');
 var assert = require('chai').assert;
 var Depender = require('../lib/depender');
+var CacheDepend = require('cache-depend');
 
 var cacheDir = path.join(__dirname, 'cache-test');
 
@@ -26,6 +27,7 @@ describe('A KaChing instance', function () {
   });
 
   afterEach(function (done) {
+    depender = null;
     kaChing.clear(function (err) {
       if(/ENOENT/.test(err)) return done();
       done(err);
@@ -43,6 +45,22 @@ describe('A KaChing instance', function () {
         done();
       });
     });
+
+    describe('when the depender becomes invalid', function () {
+      it('removes the resource', function (done) {
+        var manual = CacheDepend.manual();
+        var provider = function () {
+          this.depend(manual);
+          return streamWithContent('hello');
+        }
+        kaChing('chose', provider).pipe(sink()).on('data', function(data) {
+          kaChing.on('remove:chose', function () {
+            done();
+          });
+          manual.invalidate();
+        });
+      });
+    })
   }); 
 
 });
