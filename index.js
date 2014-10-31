@@ -59,9 +59,8 @@ function KaChing (cacheDir, options) {
       cachedStream.open();
     });
     cached[id] = cachedStream;
-    var depender = dependerFor(id);
     fillMemoryCache(cachedStream, id);
-    return provider.call(depender).pipe(cachedStream);
+    return provider.call(dependerFor(id)).pipe(cachedStream);
   }
 
   function fillMemoryCache (cachedStream, id) {
