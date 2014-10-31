@@ -51,7 +51,7 @@ The `provider` function is called in the context of an object allowing
 the user to specify on which factors the current resource should be
 invalidated.
 
-An no longer valid resource is `remove()`'d from the cache.
+A no longer valid resource is `remove()`'d from the cache.
 
 #### Expiration Date
 
