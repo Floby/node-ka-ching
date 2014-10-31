@@ -36,7 +36,7 @@ describe('a Depender instance', function () {
     });
   });
 
-  describe('.expires(date)', function () {
+  describe('for time based invalidation', function () {
     var onDate, emitter;
     beforeEach(function () {
       emitter = new EventEmitter();
@@ -45,18 +45,36 @@ describe('a Depender instance', function () {
     afterEach(function () {
       onDate.restore();
     })
-    it('uses a cache-depend Date instance', function (done) {
-      var depender = new Depender();
-      var date = new Date();
-      depender.expires(date);
-      assert(onDate.calledWith(date), 'CacheDepend.date should have been called');
-      depender.on('invalid', function() {
-        done();
-      });
+    describe('.expires(date)', function () {
+      it('uses a cache-depend Date instance', function (done) {
+        var depender = new Depender();
+        var date = new Date();
+        depender.expires(date);
+        assert(onDate.calledWith(date), 'CacheDepend.date should have been called');
+        depender.on('invalid', function() {
+          done();
+        });
 
-      setTimeout(function() {
-        emitter.emit('change', {});
-      }, 5)
+        setTimeout(function() {
+          emitter.emit('change', {});
+        }, 5)
+      });
+    });
+
+    describe('.expires.in(delay)', function () {
+      it('uses a cache-depend Date instance', function (done) {
+        var depender = new Depender();
+        var date = Date.now() + 200;
+        depender.expires.in(200);
+        assert(onDate.calledWith(date), 'CacheDepend.date should have been called');
+        depender.on('invalid', function() {
+          done();
+        });
+
+        setTimeout(function() {
+          emitter.emit('change', {});
+        }, 5)
+      });
     });
   });
 });
