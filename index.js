@@ -7,12 +7,21 @@ var stream = require('stream');
 var EventEmitter = require('events').EventEmitter;
 var emit = EventEmitter.prototype.emit;
 var writeRead = require('stream-write-read');
+var LRU = require('lru-cache');
+var sink = require('stream-sink');
+
 
 module.exports = KaChing;
 
 function KaChing (cacheDir) {
   var cached = {};
   var providers = {};
+  var lru = LRU({
+    max: 1 * 1024 * 1024, // 1 Mo
+    maxAge: 2 * 60 * 1000, // 1 minute
+    length: function (n) { return n.length }
+  });
+
   kaChing.clear = clear;
   kaChing.remove = remove;
   mixin(kaChing, EventEmitter.prototype);
@@ -38,6 +47,11 @@ function KaChing (cacheDir) {
   }
 
   function getCachedStream (id) {
+    if(lru.has(id)) {
+      var result = stream.PassThrough();
+      result.end(lru.get(id));
+      return result;
+    }
     return cached[id].createReadable();
   }
 
@@ -46,6 +60,11 @@ function KaChing (cacheDir) {
     cached[id] = cachedStream;
     whenDirectoryReady(function (err) {
       cachedStream.open();
+    });
+    setImmediate(function () {
+      cachedStream.createReadable().pipe(sink()).on('data', function(data) {
+        lru.set(id, data);
+      });
     });
     return provider().pipe(cachedStream);
   }
