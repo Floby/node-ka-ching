@@ -20,7 +20,8 @@ describe('A KaChing instance', function () {
       lru = {
         get: sinon.spy(function (k) { return cache[k] }),
         set: sinon.spy(function (k, v) { cache[k] = v }),
-        has: sinon.spy(function (k) { return cache.hasOwnProperty(k) })
+        has: sinon.spy(function (k) { return cache.hasOwnProperty(k) }),
+        del: sinon.spy(function (k) { delete cache[k] })
       };
       var LRU = function () {
         return lru;
@@ -56,6 +57,21 @@ describe('A KaChing instance', function () {
         }, 5);
       });
     })
+
+    it('deletes data from its cache when remove() is called', function (done) {
+      var provider = streamWithContent.bind(null, 'Hello World');
+      kaChing('test', provider).pipe(sink()).on('data', function() {
+        // wait for the cache to fill in
+        setTimeout(function () {
+          assert(lru.set.calledOnce, 'lru.set should have been called');
+          kaChing.remove('test', function (err) {
+            if(err) return done(err);
+            assert(lru.del.calledWith('test'), 'lru.del should have been called');
+            done();
+          })
+        }, 5);
+      });
+    });
   })
 });
 

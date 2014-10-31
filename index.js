@@ -77,6 +77,7 @@ function KaChing (cacheDir) {
     fs.unlink(cachePathFor(id), callback);
     kaChing.emit('remove', id);
     kaChing.emit('remove:' + id);
+    lru.del(id);
     delete cached[id];
   }
 
