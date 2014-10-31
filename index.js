@@ -8,6 +8,7 @@ var EventEmitter = require('events').EventEmitter;
 var emit = EventEmitter.prototype.emit;
 var writeRead = require('stream-write-read');
 var LRU = require('lru-cache');
+var BlackHoleLRU = require('./lib/blackhole-lru');
 var sink = require('stream-sink');
 
 
@@ -99,10 +100,3 @@ var defaultLruOptions = {
   length: function (n) { return n.length }
 }
 
-function BlackHoleLRU () {
-  if(!(this instanceof BlackHoleLRU)) return new BlackHoleLRU();
-
-  this.has = function () { return false };
-  this.set = function () {};
-  this.del = function () {};
-}
