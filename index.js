@@ -69,6 +69,13 @@ function KaChing (cacheDir, options) {
     });
   }
 
+  function dependerFor (id) {
+    var depender = Depender();
+    depender.once('invalid', remove.bind(null, id));
+    if(options.maxAge) depender.expires.in(options.maxAge);
+    return depender;
+  }
+
   function isCacheAvailable (id, callback) {
     process.nextTick(callback.bind(null, Boolean(cached[id])));
   }
@@ -80,13 +87,6 @@ function KaChing (cacheDir, options) {
     kaChing.emit('remove:' + id);
     lru.del(id);
     delete cached[id];
-  }
-
-  function dependerFor (id) {
-    var depender = Depender();
-    depender.once('invalid', remove.bind(null, id));
-    if(options.maxAge) depender.expires.in(options.maxAge);
-    return depender;
   }
 
   function cachePathFor (id) {
