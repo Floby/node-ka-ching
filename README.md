@@ -14,7 +14,7 @@ Usage
 -----
 
 
-##### Basic
+#### Basic
 
 Pipe the result of a request to `google.com` and cache it to `my-cached-resource`.
 When the cache is already populated, the given provider is not called and the cached
@@ -30,7 +30,7 @@ kaChing('my-cached-resource-id', function () {
 
 ```
 
-##### Delete a cached resource
+#### Delete a cached resource
 
 
 ```javascript
@@ -44,7 +44,44 @@ var uncached = kaChing('my-cached-resource-id');
 
 The first subsequent request for this ID will call the provider
 
-##### In-memory caching
+Invalidation
+------------
+
+The `provider` function is called in the context of an object allowing
+the user to specify on which factors the current resource should be
+invalidated.
+
+An no longer valid resource is `remove()`'d from the cache.
+
+#### Expiration Date
+
+`expires(date)`: you can call this method to specify a date at which the resource
+is to be invalidated.
+If you provide a string, then a new `Date` object will be constructed from it.
+
+```javascript
+kaChing('my-resource', function () {
+  var result = getReadableStreamSomehow();
+  this.expires('2015-01-01T00:00');
+  return result;
+});
+```
+
+#### Expiration Delay
+
+`expires.in(ms)`: invalidate this resource in `ms` milliseconds.
+
+```javascript
+kaChing('my-resource', function () {
+  var result = getReadableStreamSomehow();
+  this.expires.in(5 * 60 * 1000);
+  return result;
+});
+```
+
+
+In-memory caching
+-----------------
 
 You can provide a `memoryCache` option to the `KaChing` constructor.
 It will in turn also use an `lru-cache` for cached resources.
