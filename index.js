@@ -55,12 +55,12 @@ function KaChing (cacheDir, options) {
 
   function makeCachedStream (id, provider) {
     var cachedStream = writeRead(cachePathFor(id), { delayOpen: true });
-    cached[id] = cachedStream;
-    var depender = Depender();
-    depender.once('invalid', remove.bind(null, id));
     whenDirectoryReady(function (err) {
       cachedStream.open();
     });
+    cached[id] = cachedStream;
+    var depender = Depender();
+    depender.once('invalid', remove.bind(null, id));
     fillMemoryCache(cachedStream, id);
     return provider.call(depender).pipe(cachedStream);
   }
