@@ -10,6 +10,7 @@ var writeRead = require('stream-write-read');
 var LRU = require('lru-cache');
 var BlackHoleLRU = require('./lib/blackhole-lru');
 var sink = require('stream-sink');
+var Depender = require('./lib/depender');
 
 module.exports = KaChing;
 
@@ -54,11 +55,12 @@ function KaChing (cacheDir, options) {
   function makeCachedStream (id, provider) {
     var cachedStream = writeRead(cachePathFor(id), { delayOpen: true });
     cached[id] = cachedStream;
+    var depender = Depender();
     whenDirectoryReady(function (err) {
       cachedStream.open();
     });
     fillMemoryCache(cachedStream, id);
-    return provider().pipe(cachedStream);
+    return provider.call(depender).pipe(cachedStream);
   }
 
   function fillMemoryCache (cachedStream, id) {
