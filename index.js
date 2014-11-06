@@ -3,7 +3,7 @@ var rmR = require('rm-r');
 var mkdirp = require('mkdirp');
 var mixin = require('merge-descriptors');
 var path = require('path');
-var noop = require('node-noop');
+var blackhole = require('stream-blackhole');
 var stream = require('stream');
 var EventEmitter = require('events').EventEmitter;
 var emit = EventEmitter.prototype.emit;
@@ -73,6 +73,11 @@ function KaChing (cacheDir, options) {
     var depender = Depender();
     depender.once('invalid', remove.bind(null, id));
     if(options.maxAge) depender.expires.in(options.maxAge);
+    if(options.reactive) {
+      depender.once('invalid', function() {
+        kaChing(id).pipe(blackhole());
+      });
+    }
     return depender;
   }
 
@@ -81,7 +86,7 @@ function KaChing (cacheDir, options) {
   }
 
   function remove (id, callback) {
-    callback = callback || noop;
+    callback = callback;
     fs.unlink(cachePathFor(id), callback);
     kaChing.emit('remove', id);
     kaChing.emit('remove:' + id);
