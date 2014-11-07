@@ -12,6 +12,7 @@ var LRU = require('lru-cache');
 var BlackHoleLRU = require('./lib/blackhole-lru');
 var sink = require('stream-sink');
 var Depender = require('./lib/depender');
+var hashSum = require('./lib/hashSum')
 
 module.exports = KaChing;
 
@@ -95,7 +96,7 @@ function KaChing (cacheDir, options) {
   }
 
   function cachePathFor (id) {
-    return path.join(cacheDir, id);
+    return path.join(cacheDir, hashSum(id));
   }
   function providerFor (id, provider) {
     return providers[id] = provider || providers[id];
