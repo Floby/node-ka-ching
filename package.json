@@ -1,6 +1,6 @@
 {
   "name": "ka-ching",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "A caching module for streams",
   "main": "index.js",
   "directories": {
