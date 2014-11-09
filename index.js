@@ -19,6 +19,7 @@ module.exports = KaChing;
 
 function KaChing (cacheDir, options) {
   options = options || {};
+  var disabled = options.disable;
   var cached = {};
   var providers = {};
   var lru = options.memoryCache ? LRU(lruOptions(options)) : BlackHoleLRU();
@@ -40,6 +41,7 @@ function KaChing (cacheDir, options) {
     if(typeof provider !== 'function') {
       throw new Error('No provider found for resource ' + id);
     }
+    if(disabled) return provider.call(dependerFor(id));
 
     var output = stream.PassThrough();
     isCacheAvailable(id, function (available) {
@@ -114,6 +116,7 @@ function KaChing (cacheDir, options) {
   }
 
   function remove (id, callback) {
+    if(disabled) return process.nextTick(callback)
     callback = callback;
     fs.unlink(cachePathFor(id), callback);
     kaChing.emit('remove', id);
