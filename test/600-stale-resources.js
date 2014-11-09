@@ -1,3 +1,4 @@
+require('long-stack-traces')
 var stream = require('stream');
 var sink = require('stream-sink');
 var sinon = require('sinon');
@@ -33,6 +34,34 @@ describe('A KaChing instance', function () {
           done();
         });
       });
+
+      describe('called a second time after a remove', function () {
+        it('calls the provider but streams the first content', function(done) {
+          var count = 0;
+          var provider = sinon.spy(function () {
+            return streamWithContent('O HAI ' + (++count));
+          });
+
+          kaChing.stale('chose', provider).pipe(sink()).on('data', function(contents) {
+            assert.equal(provider.callCount, 1, 'provider should have been called once');
+            expect(contents).to.equal('O HAI 1');
+            kaChing.remove('chose', function (err) {
+              if(err) return done(err);
+              kaChing.stale('chose', provider).pipe(sink()).on('data', function(contents) {
+                assert.equal(provider.callCount, 2, 'provider should have been called twice');
+                expect(contents).to.equal('O HAI 1');
+                setTimeout(function () {
+                  kaChing.stale('chose', provider).pipe(sink()).on('data', function(contents) {
+                    assert.equal(provider.callCount, 2, 'provider should not have been called again');
+                    expect(contents).to.equal('O HAI 2');
+                    done();
+                  });
+                }, 20);
+              });
+            });
+          });
+        })
+      })
     })
   });
 })
