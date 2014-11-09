@@ -1,4 +1,3 @@
-require('long-stack-traces')
 var stream = require('stream');
 var sink = require('stream-sink');
 var sinon = require('sinon');
