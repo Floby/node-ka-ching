@@ -4,6 +4,7 @@ var sinon = require('sinon');
 var expect = require('chai').expect;
 var path = require('path');
 var assert = require('chai').assert;
+var streamWithContent = require('./utils').streamWithContent;
 var KaChing = require('..');
 
 var cacheDir = path.join(__dirname, 'cache-test');
@@ -68,12 +69,3 @@ describe('A KaChing instance', function () {
     });
   })
 });
-
-
-function streamWithContent (content) {
-  var result = stream.PassThrough();
-  process.nextTick(function () {
-    result.end(content);
-  });
-  return result;
-}
