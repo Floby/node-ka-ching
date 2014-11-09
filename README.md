@@ -44,6 +44,26 @@ var uncached = kaChing('my-cached-resource-id');
 
 The first subsequent request for this ID will call the provider
 
+#### Stale resources
+
+When instanciated with the `useStale` option, then it is possible
+to get stale resources (when available) with the `stale()` method.
+
+```javascript
+var kaChing = new KaChing('/my/dir', { useStale: true });
+
+kaChing.stale('cached-resource', provider);
+kaChing.remove('cached-resource');
+kaChing.stale('cached-resource'); // calls the provider but gives you the cached version
+```
+
+Note that `stale()` has the exact same signature as the `kaChing()` function and
+does exactly the same thing if `useStale` is not set.
+
+This is useful when using invalidation as shown below. If your resource
+becomes invalid but you still want to reploy rapidly, you can use a stale
+version of it.
+
 Invalidation
 ------------
 

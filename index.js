@@ -20,7 +20,8 @@ function KaChing (cacheDir, options) {
   options = options || {};
   var cached = {};
   var providers = {};
-  var lru = options.memoryCache ? LRU(lruOptions(options)) : BlackHoleLRU()
+  var lru = options.memoryCache ? LRU(lruOptions(options)) : BlackHoleLRU();
+  kaChing.stale = kaChing;
   kaChing.clear = clear;
   kaChing.remove = remove;
   mixin(kaChing, EventEmitter.prototype);
