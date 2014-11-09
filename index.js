@@ -13,24 +13,23 @@ var BlackHoleLRU = require('./lib/blackhole-lru');
 var sink = require('stream-sink');
 var Depender = require('./lib/depender');
 var hashSum = require('./lib/hashSum')
+var lruOptions = require('./lib/lru-options');
 
 module.exports = KaChing;
 
 function KaChing (cacheDir, options) {
   options = options || {};
-  var useStale = Boolean(options.useStale);
   var cached = {};
   var providers = {};
   var lru = options.memoryCache ? LRU(lruOptions(options)) : BlackHoleLRU();
-  kaChing.stale = kaChing;
+  kaChing.stale = options.useStale ? getStale : kaChing;
   if(options.useStale) {
     var staleCache = new KaChing(path.join(cacheDir, 'stale'));
-    kaChing.stale = getStale;
   }
   kaChing.clear = clear;
   kaChing.remove = remove;
-  kaChing.has = has;
-  kaChing.hasReady = hasReady;
+  kaChing.has = function (id) { return Boolean(cached[id]) }
+  kaChing.hasReady = function (id) { return cached[id] && cached[id].ready }
   mixin(kaChing, EventEmitter.prototype);
 
   return kaChing;
@@ -98,23 +97,20 @@ function KaChing (cacheDir, options) {
     process.nextTick(callback.bind(null, Boolean(cached[id])));
   }
 
+  function getStale (id, provider) {
+    if(!kaChing.hasReady(id) && staleCache.has(id)) {
+      kaChing(id, provider).pipe(blackhole());
+      return staleCache(id);
+    }
+    return kaChing(id, provider)
+  }
+
   function cacheStale(id) {
     staleCache.remove(id, function () {
       staleCache(id, function () {
         return kaChing(id);
       }).pipe(blackhole())
     });
-  }
-
-  function getStale (id, provider) {
-    if(kaChing.hasReady(id)) {
-      return kaChing(id);
-    }
-    if(staleCache.has(id)) {
-      kaChing(id, provider).pipe(blackhole());
-      return staleCache(id);
-    }
-    return kaChing(id, provider);
   }
 
   function remove (id, callback) {
@@ -124,14 +120,6 @@ function KaChing (cacheDir, options) {
     kaChing.emit('remove:' + id);
     lru.del(id);
     delete cached[id];
-  }
-
-  function has (id) {
-    return Boolean(cached[id]);
-  }
-
-  function hasReady (id) {
-    return cached[id] && cached[id].ready;
   }
 
   function cachePathFor (id) {
@@ -147,18 +135,3 @@ function KaChing (cacheDir, options) {
     rmR(cacheDir).node(callback);
   }
 }
-
-function lruOptions (options) {
-  var max;
-  if (options.memoryCache === true) {
-    max = 5 * 1024 * 1024 // 5 mo
-  }
-  else {
-    max = options.memoryCache;
-  }
-  return {
-    max: max,
-    length: function (n) { return n.length }
-  }
-}
-
