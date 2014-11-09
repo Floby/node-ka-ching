@@ -1,3 +1,5 @@
 .*.un~
+.coveralls.yml
+.travis.yml
 test/
 coverage/
