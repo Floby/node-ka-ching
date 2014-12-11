@@ -64,6 +64,19 @@ This is useful when using invalidation as shown below. If your resource
 becomes invalid but you still want to reply rapidly, you can use a stale
 version of it.
 
+
+#### Bypass
+
+You can bypass all caching by instanciating `KaChing` with the `disable` option 
+
+```javascript
+var kaChing = new KaChing('/my/dir', { disable: true });
+
+kaChing('my-id', function () {
+  return myReadbleStream();
+}) ///> always call the provider
+```
+
 Invalidation
 ------------
 
