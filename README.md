@@ -121,6 +121,8 @@ boolean flag.
 Would you be surprised if I told you that [cache-depend][cache-depend-url] provides
 exactly this type of objects?
 
+Other invalidation mechanisms may be provided in the future
+
 
 In-memory caching
 -----------------
@@ -162,7 +164,6 @@ Gotchas
 
 * Only works with `text/buffer` streams. If you'd like to cache `objectMode` streams,
 you should handle serialisation/deserialisation yourself
-* No intelligence whatsoever as to when to invalidate cached data
 * Does not play well with concurrent access to the file system
 * Cannot recover from file system after restart
 
