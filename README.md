@@ -61,7 +61,7 @@ Note that `stale()` has the exact same signature as the `kaChing()` function and
 does exactly the same thing if `useStale` is not set.
 
 This is useful when using invalidation as shown below. If your resource
-becomes invalid but you still want to reploy rapidly, you can use a stale
+becomes invalid but you still want to reply rapidly, you can use a stale
 version of it.
 
 Invalidation
@@ -98,6 +98,15 @@ kaChing('my-resource', function () {
   return result;
 });
 ```
+
+#### Any other expiration rule
+
+`depend(emitter)` : makes the cached resource depend on this. `emitter` is an object
+which emits a `'change'` event when the resource should be cleared and has a `invalid`
+boolean flag.
+
+Would you be surprised if I told you that [cache-depend][cache-depend-url] provides
+exactly this type of objects?
 
 
 In-memory caching
@@ -170,5 +179,5 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 [travis-url]: https://travis-ci.org/Floby/node-ka-ching
 [coveralls-image]: http://img.shields.io/coveralls/Floby/node-ka-ching/master.svg?style=flat
 [coveralls-url]: https://coveralls.io/r/Floby/node-ka-ching
-
+[cache-depend-url]: https://github.com/Floby/node-cache-depend
 
