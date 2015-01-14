@@ -3,17 +3,17 @@ var rmR = require('rm-r');
 var mkdirp = require('mkdirp');
 var mixin = require('merge-descriptors');
 var path = require('path');
-var blackhole = require('stream-blackhole');
-var stream = require('stream');
 var EventEmitter = require('events').EventEmitter;
 var emit = EventEmitter.prototype.emit;
+var stream = require('stream');
+var sink = require('stream-sink');
+var blackhole = require('stream-blackhole');
 var writeRead = require('stream-write-read');
 var LRU = require('lru-cache');
 var BlackHoleLRU = require('./lib/blackhole-lru');
-var sink = require('stream-sink');
-var Depender = require('./lib/depender');
-var hashSum = require('./lib/hashSum')
 var lruOptions = require('./lib/lru-options');
+var Depender = require('./lib/depender');
+var hashSum = require('./lib/hashSum');
 
 module.exports = KaChing;
 
@@ -45,8 +45,8 @@ function KaChing (cacheDir, options) {
 
     var output = stream.PassThrough();
     isCacheAvailable(id, function (available) {
-      var source = available ? getCachedStream(id) : makeCachedStream(id, provider)
-      source.pipe(output)
+      var source = available ? getCachedStream(id) : makeCachedStream(id, provider);
+      source.pipe(output);
     });
 
     kaChing.once('remove:'+id, emit.bind(output, 'remove'));
@@ -84,7 +84,7 @@ function KaChing (cacheDir, options) {
   }
 
   function dependerFor (id) {
-    var depender = Depender();
+    var depender = new Depender();
     depender.once('invalid', remove.bind(null, id));
     if(options.maxAge) depender.expires.in(options.maxAge);
     if(options.reactive) {
@@ -104,19 +104,19 @@ function KaChing (cacheDir, options) {
       kaChing(id, provider).pipe(blackhole());
       return staleCache(id);
     }
-    return kaChing(id, provider)
+    return kaChing(id, provider);
   }
 
   function cacheStale(id) {
     staleCache.remove(id, function () {
       staleCache(id, function () {
         return kaChing(id);
-      }).pipe(blackhole())
+      }).pipe(blackhole());
     });
   }
 
   function remove (id, callback) {
-    if(disabled) return process.nextTick(callback)
+    if(disabled) return process.nextTick(callback);
     callback = callback;
     fs.unlink(cachePathFor(id), callback);
     kaChing.emit('remove', id);
@@ -129,7 +129,8 @@ function KaChing (cacheDir, options) {
     return path.join(cacheDir, hashSum(id));
   }
   function providerFor (id, provider) {
-    return providers[id] = provider || providers[id];
+    providers[id] = provider || providers[id];
+    return providers[id];
   }
   function whenDirectoryReady (callback) {
     mkdirp(cacheDir, callback);
