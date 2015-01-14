@@ -28,6 +28,7 @@ function KaChing (cacheDir, options) {
     var staleCache = new KaChing(path.join(cacheDir, 'stale'));
   }
   kaChing.clear = clear;
+  kaChing.doc = getDoc;
   kaChing.remove = remove;
   kaChing.has = function (id) { return Boolean(cached[id]) }
   kaChing.hasReady = function (id) { return cached[id] && cached[id].ready }
@@ -65,9 +66,7 @@ function KaChing (cacheDir, options) {
 
   function makeCachedStream (id, provider) {
     var cachedStream = writeRead(cachePathFor(id), { delayOpen: true });
-    whenDirectoryReady(function (err) {
-      cachedStream.open();
-    });
+    whenDirectoryReady(cachedStream.open);
     cached[id] = cachedStream;
     cachedStream.on('finish', function() {
       cachedStream.ready = true;
@@ -115,9 +114,20 @@ function KaChing (cacheDir, options) {
     });
   }
 
+  function getDoc (id, provider, callback) {
+    kaChing(id, function () {
+      var output = stream.PassThrough();
+      provider(function (err, doc) {
+        output.end(JSON.stringify(doc));
+      });
+      return output;
+    }).pipe(sink()).on('data', function(data) {
+      callback(null, JSON.parse(data));
+    });
+  }
+
   function remove (id, callback) {
     if(disabled) return process.nextTick(callback);
-    callback = callback;
     fs.unlink(cachePathFor(id), callback);
     kaChing.emit('remove', id);
     kaChing.emit('remove:' + id);
