@@ -44,15 +44,15 @@ function KaChing (cacheDir, options) {
     }
     if(disabled) return provider.call(dependerFor(id));
 
-    var output = stream.PassThrough();
+    var resultStream = stream.PassThrough();
     isCacheAvailable(id, function (available) {
       var source = available ? getCachedStream(id) : makeCachedStream(id, provider);
-      source.pipe(output);
+      source.pipe(resultStream);
     });
 
-    kaChing.once('remove:'+id, emit.bind(output, 'remove'));
+    kaChing.once('remove:'+id, emit.bind(resultStream, 'remove'));
 
-    return output;
+    return resultStream;
   }
 
   function getCachedStream (id) {
@@ -66,7 +66,7 @@ function KaChing (cacheDir, options) {
 
   function makeCachedStream (id, provider) {
     var cachedStream = writeRead(cachePathFor(id), { delayOpen: true });
-    whenDirectoryReady(cachedStream.open);
+    whenCacheDirectoryReady(cachedStream.open);
     cached[id] = cachedStream;
     cachedStream.on('finish', function() {
       cachedStream.ready = true;
@@ -142,7 +142,7 @@ function KaChing (cacheDir, options) {
     providers[id] = provider || providers[id];
     return providers[id];
   }
-  function whenDirectoryReady (callback) {
+  function whenCacheDirectoryReady (callback) {
     mkdirp(cacheDir, callback);
   }
   function clear (callback) {
