@@ -147,8 +147,8 @@ as the maximum size (in bytes) for the underlying `lru-cache`.
 
 My personal (and unpublished) benchmarks have shown that this is seldom useful
 as your OS is probably already doing it with the files that kaChing reads most
-often. They have however shown some improvement for the 98-99% percentiles
-in a HTTP server of roughly 30%.
+often. They have however shown an improvement of roughly 30% for the 98-99% percentiles of
+requests in a HTTP server.
 
 
 Test
@@ -180,7 +180,7 @@ License
 
 [MIT](http://opensource.org/licenses/MIT)
 
-Copyright (c) 2014 Florent Jaby
+Copyright (c) 2015 Florent Jaby
 
 Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
 
