@@ -123,6 +123,27 @@ exactly this type of objects?
 
 Other invalidation mechanisms may be provided in the future
 
+#### Reactive refresh
+
+Resources can be proactively refreshed when their cached version expires or is invalidated.
+You can provide `true` for `reactive` option on instanciation. This will automatically
+call the resource provider when the cache becomes invalid.
+
+```javascript
+var kaChing = require('ka-ching')('/path/to/cache/dir', {reactive: true});
+
+kaChing('some-resource', function () {
+  this.expires.in(2000);
+  return request.get("http://google.com");
+});
+
+kaChing.on('remove:some-resource', function () {
+  // the provider has already been called for caching
+});
+```
+
+This is compatible with stale resources as well.
+
 
 In-memory caching
 -----------------
