@@ -22,7 +22,7 @@ function KaChing (cacheDir, options) {
   var disabled = options.disable;
   var cached = {};
   var providers = {};
-  var lru = options.memoryCache ? LRU(lruOptions(options)) : BlackHoleLRU();
+  var lru = options.memoryCache ? new LRU(lruOptions(options)) : new BlackHoleLRU();
   kaChing.stale = options.useStale ? getStale : kaChing;
   if(options.useStale) {
     var staleCache = new KaChing(path.join(cacheDir, 'stale'));
