@@ -42,9 +42,9 @@ function KaChing (cacheDir, options) {
     if(typeof provider !== 'function') {
       throw new Error('No provider found for resource ' + id);
     }
-    if(disabled) return provider.call(dependerFor(id));
-
     var resultStream = new KaChingOutputStream();
+    if(disabled) return provider.call(dependerFor(id)).pipe(resultStream);
+
     isCacheAvailable(id, function (available) {
       var source = available ? getCachedStream(id) : makeCachedStream(id, provider);
       source.pipe(resultStream);
