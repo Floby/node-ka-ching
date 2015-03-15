@@ -30,8 +30,8 @@ function KaChing (cacheDir, options) {
   kaChing.clear = clear;
   kaChing.doc = getDoc;
   kaChing.remove = remove;
-  kaChing.has = function (id) { return Boolean(cached[id]) }
-  kaChing.hasReady = function (id) { return cached[id] && cached[id].ready }
+  kaChing.has = function (id) { return Boolean(cached[id]); };
+  kaChing.hasReady = function (id) { return cached[id] && cached[id].ready; };
   mixin(kaChing, EventEmitter.prototype);
 
   return kaChing;
