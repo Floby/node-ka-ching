@@ -41,9 +41,11 @@ describe('a Depender instance', function () {
     beforeEach(function () {
       emitter = new EventEmitter();
       onDate = sinon.stub(CacheDepend, 'date').returns(emitter);
+      sinon.stub(Date, 'now').returns(1234567890);
     });
     afterEach(function () {
       onDate.restore();
+      Date.now.restore();
     })
     describe('.expires(date)', function () {
       it('uses a cache-depend Date instance', function (done) {
@@ -66,7 +68,9 @@ describe('a Depender instance', function () {
         var depender = new Depender();
         var date = Date.now() + 200;
         depender.expires.in(200);
-        assert(onDate.calledWith(date), 'CacheDepend.date should have been called');
+        assert(onDate.calledOnce, 'CacheDepend.date should have been called');
+        var callParam = onDate.getCall(0).args[0];
+        expect(callParam).to.equal(date, 'wrong date param');
         depender.on('invalid', function() {
           done();
         });
