@@ -5,11 +5,11 @@ var mixin = require('merge-descriptors');
 var path = require('path');
 var EventEmitter = require('events').EventEmitter;
 var emit = EventEmitter.prototype.emit;
-var stream = require('stream');
 var sink = require('stream-sink');
 var blackhole = require('stream-blackhole');
 var writeRead = require('stream-write-read');
 var LRU = require('lru-cache');
+var KaChingOutputStream = require('./lib/ka-ching-output-stream');
 var BlackHoleLRU = require('./lib/blackhole-lru');
 var lruOptions = require('./lib/lru-options');
 var Depender = require('./lib/depender');
@@ -44,7 +44,7 @@ function KaChing (cacheDir, options) {
     }
     if(disabled) return provider.call(dependerFor(id));
 
-    var resultStream = stream.PassThrough();
+    var resultStream = new KaChingOutputStream();
     isCacheAvailable(id, function (available) {
       var source = available ? getCachedStream(id) : makeCachedStream(id, provider);
       source.pipe(resultStream);
@@ -57,7 +57,7 @@ function KaChing (cacheDir, options) {
 
   function getCachedStream (id) {
     if(lru.has(id)) {
-      var result = stream.PassThrough();
+      var result = new KaChingOutputStream();
       result.end(lru.get(id));
       return result;
     }
@@ -116,7 +116,7 @@ function KaChing (cacheDir, options) {
 
   function getDoc (id, provider, callback) {
     kaChing(id, function () {
-      var output = stream.PassThrough();
+      var output = new KaChingOutputStream();
       provider(function (err, doc) {
         output.end(JSON.stringify(doc));
       });

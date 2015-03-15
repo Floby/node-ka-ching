@@ -5,6 +5,7 @@ var sinon = require('sinon');
 var expect = require('chai').expect;
 var path = require('path');
 var assert = require('chai').assert;
+var KaChingOutputStream = require('../lib/ka-ching-output-stream');
 var streamWithContent = require('./utils').streamWithContent;
 
 var cacheDir = path.join(__dirname, 'cache-test');
@@ -32,6 +33,11 @@ describe('A KaChing instance', function () {
   it('returns a readable stream', function () {
     var readable = kaChing('bidule', streamWithContent.bind(null, 'Hello World'));
     expect(readable).to.be.an.instanceof(stream.Readable);
+  });
+
+  it('returns a KaChingOutputStream', function () {
+    var readable = kaChing('bidule', streamWithContent.bind(null, 'Hello World'));
+    expect(readable).to.be.an.instanceof(KaChingOutputStream);
   });
 
   describe('when called with no provider', function () {
