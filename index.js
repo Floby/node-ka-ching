@@ -50,6 +50,7 @@ function KaChing (cacheDir, options) {
       source.pipe(resultStream);
     });
 
+    kaChing.once('invalid:'+id, emit.bind(resultStream, 'invalid'));
     kaChing.once('remove:'+id, emit.bind(resultStream, 'remove'));
 
     return resultStream;
@@ -84,6 +85,7 @@ function KaChing (cacheDir, options) {
 
   function dependerFor (id) {
     var depender = new Depender();
+    depender.once('invalid', emit.bind(kaChing, 'invalid:' + id));
     depender.once('invalid', remove.bind(null, id));
     if(options.maxAge) depender.expires.in(options.maxAge);
     if(options.reactive) {

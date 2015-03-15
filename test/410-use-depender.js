@@ -61,6 +61,22 @@ describe('A KaChing instance', function () {
           manual.invalidate();
         });
       });
+
+      it('relays the event on the stream itself', function (done) {
+        var manual = CacheDepend.manual();
+        var provider = function () {
+          this.depend(manual);
+          return streamWithContent('O HAI');
+        };
+        var onInvalid = sinon.spy();
+        kaChing('aaa', provider).on('invalid', onInvalid).pipe(sink()).on('data', function() {
+          manual.invalidate();
+          process.nextTick(function () {
+            assert.equal(onInvalid.callCount, 1, '"invalid" event not emitted');
+            done();
+          });
+        });
+      });
     })
   }); 
 
