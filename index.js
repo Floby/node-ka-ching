@@ -49,29 +49,6 @@ function KaChing (cacheDir, options) {
     return resource();
   }
 
-  function fillMemoryCache (cachedStream, id) {
-    cachedStream.createReadable().pipe(sink()).on('data', function(data) {
-      lru.set(id, new Buffer(data));
-    });
-  }
-
-  function dependerFor (id) {
-    var depender = new Depender();
-    depender.once('invalid', emit.bind(kaChing, 'invalid:' + id));
-    depender.once('invalid', remove.bind(null, id));
-    if(options.maxAge) depender.expires.in(options.maxAge);
-    if(options.reactive) {
-      depender.once('invalid', function() {
-        kaChing(id).pipe(blackhole());
-      });
-    }
-    return depender;
-  }
-
-  function isCacheAvailable (id, callback) {
-    process.nextTick(callback.bind(null, Boolean(cached[id])));
-  }
-
   function getStale (id, provider) {
     if(!kaChing.hasReady(id) && staleCache.has(id)) {
       kaChing(id, provider).pipe(blackhole());
@@ -104,11 +81,6 @@ function KaChing (cacheDir, options) {
     if (!resources[id]) return process.nextTick(callback);
     kaChing.emit('remove', id);
     return resourceFor(id).remove(callback);
-
-    fs.unlink(cachePathFor(id), callback);
-    kaChing.emit('remove:' + id);
-    lru.del(id);
-    delete cached[id];
   }
 
   function resourceFor (id, provider) {
@@ -121,16 +93,6 @@ function KaChing (cacheDir, options) {
     return resources[id];
   }
 
-  function cachePathFor (id) {
-    return path.join(cacheDir, hashSum(id));
-  }
-  function providerFor (id, provider) {
-    providers[id] = provider || providers[id];
-    return providers[id];
-  }
-  function whenCacheDirectoryReady (callback) {
-    mkdirp(cacheDir, callback);
-  }
   function clear (callback) {
     rmR(cacheDir).node(callback);
   }
