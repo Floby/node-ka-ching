@@ -1,3 +1,4 @@
+//require('stackup')
 var stream = require('stream');
 var sink = require('stream-sink');
 var sinon = require('sinon');

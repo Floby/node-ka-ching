@@ -44,64 +44,32 @@ describe('A KaChing instance', function () {
       });
     });
 
-    it('uses an LRU cache for resources', function (done) {
-      var provider = streamWithContent.bind(null, 'Hello World');
-      kaChing('test', provider).pipe(sink()).on('data', function() {
-        // wait for the cache to fill in
-        setTimeout(function () {
-          assert(lru.set.calledOnce, 'lru.set should have been called');
-          kaChing('test').pipe(sink()).on('data', function(data) {
-            assert.equal(data, 'Hello World', 'Data should be the same');
-            assert(lru.has.calledWith('test'), 'lru.has should have been called');
-            assert(lru.get.calledWith('test'), 'lru.get should have been called');
-            expect(cache.test.toString()).to.equal('Hello World');
-            done();
-          });
-        }, 5);
-      });
-    })
-
-    it('deletes data from its cache when remove() is called', function (done) {
-      var provider = streamWithContent.bind(null, 'Hello World');
-      kaChing('test', provider).pipe(sink()).on('data', function() {
-        // wait for the cache to fill in
-        setTimeout(function () {
-          assert(lru.set.calledOnce, 'lru.set should have been called');
-          kaChing.remove('test', function (err) {
-            if(err) return done(err);
-            assert(lru.del.calledWith('test'), 'lru.del should have been called');
-            done();
-          })
-        }, 5);
+    describe('if the memoryCache option is a boolean', function () {
+      it('uses a default `max` value for its lru-cache', function () {
+        var LRU = sinon.spy(function (options) {
+          expect(options.max).to.equal(5 * 1024 * 1024);
+          return {};
+        })
+        var KaChing = proxyquire('..', {
+          'lru-cache': LRU
+        });
+        var kaChing = KaChing(cacheDir, {memoryCache: true});
+        assert(LRU.called, 'LRU should have been constructed');
       });
     });
-  })
 
-  describe('if the memoryCache option is a boolean', function () {
-    it('uses a default `max` value for its lru-cache', function () {
-      var LRU = sinon.spy(function (options) {
-        expect(options.max).to.equal(5 * 1024 * 1024);
-        return {};
-      })
-      var KaChing = proxyquire('..', {
-        'lru-cache': LRU
+    describe('if the memoryCache option is a number', function () {
+      it('uses this value for its lru-cache', function () {
+        var LRU = sinon.spy(function (options) {
+          expect(options.max).to.equal(8);
+          return {};
+        })
+        var KaChing = proxyquire('..', {
+          'lru-cache': LRU
+        });
+        var kaChing = KaChing(cacheDir, {memoryCache: 8});
+        assert(LRU.called, 'LRU should have been constructed');
       });
-      var kaChing = KaChing(cacheDir, {memoryCache: true});
-      assert(LRU.called, 'LRU should have been constructed');
-    });
-  });
-
-  describe('if the memoryCache option is a number', function () {
-    it('uses this value for its lru-cache', function () {
-      var LRU = sinon.spy(function (options) {
-        expect(options.max).to.equal(8);
-        return {};
-      })
-      var KaChing = proxyquire('..', {
-        'lru-cache': LRU
-      });
-      var kaChing = KaChing(cacheDir, {memoryCache: 8});
-      assert(LRU.called, 'LRU should have been constructed');
     });
   });
 });
