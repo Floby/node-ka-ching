@@ -43,13 +43,17 @@ describe('A KaChing resource', function () {
               if(err) return done(err);
               resource().pipe(sink()).on('data', function(contents) {
                 expect(contents).to.equal('Hello World 2');
+                console.log('calling done 1')
                 done();
                 assert.equal(3, provider.callCount, 'provider calls');
               });
             })
           });
         });
-      }, done)
+      }, function (err) {
+        console.log('calling done', err.stack);
+        done(err);
+      })
     })
   })
 })
