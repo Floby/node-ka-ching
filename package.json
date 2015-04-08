@@ -42,13 +42,14 @@
     "trycatch": "^1.5.11"
   },
   "dependencies": {
-    "merge-descriptors": "^1.0.0",
     "cache-depend": "^0.2.1",
     "extend": "^2.0.0",
     "lru-cache": "^2.5.0",
+    "merge-descriptors": "^1.0.0",
     "mkdirp": "^0.5.0",
     "node-noop": "0.0.1",
     "rm-r": "^1.0.2",
+    "rwlock": "^5.0.0",
     "stream-blackhole": "^1.0.3",
     "stream-sink": "^1.2.0",
     "stream-write-read": "^2.0.1"
