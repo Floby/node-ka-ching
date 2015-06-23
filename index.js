@@ -39,7 +39,7 @@ function KaChing (cacheDir, options) {
         cacheStale(id);
       })
     }
-    return resource();
+    return resource(provider);
   }
 
   function getStale (id, provider) {
