@@ -13,9 +13,10 @@ describe('A KaChing resource', function () {
   var options = {
     cacheDir : cacheDir
   };
-  var resource, provider;
+  var resource, provider, provider2;
   beforeEach(function () {
     provider = sinon.spy(streamWithContent.bind(null, 'Hello World'));
+    provider2 = sinon.spy(streamWithContent.bind(null, 'Hello World again'));
     resource = new Resource('my-id', provider, options);
   });
 
@@ -37,6 +38,22 @@ describe('A KaChing resource', function () {
           })
         });
       });
+
+      describe('when called again with a new provider', function () {
+        it('uses that new provider', function (done) {
+          resource(provider).pipe(sink()).on('data', function (data) {
+            resource.remove(function (err) {
+              if (err) return done(err);
+              resource(provider2).pipe(sink()).on('data', function(data) {
+                assert(provider.calledOnce, 'provider1 should have been called once');
+                assert(provider2.calledOnce, 'provider2 should have been called once');
+                assert.equal(data, 'Hello World again')
+                done();
+              });
+            })
+          })
+        })
+      })
 
       it('emits a "remove" event', function (done) {
         var onRemove = sinon.spy();
